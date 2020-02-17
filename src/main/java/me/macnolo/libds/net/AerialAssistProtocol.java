@@ -8,9 +8,10 @@
 
 package me.macnolo.libds.net;
 
+import me.macnolo.libds.object.NetPackage;
 import me.macnolo.libds.object.ProtocolTemplate;
 
-public class AerialAssistProtocol extends ProtocolTemplate {
+public class AerialAssistProtocol implements ProtocolTemplate {
 
     static final String version = "v.1.0 nightly.";
     static final String name = "Aerial Assist Protocol.";
@@ -41,6 +42,7 @@ public class AerialAssistProtocol extends ProtocolTemplate {
     private static int reboot = 0;
     private static int restartCode = 0;
 
+    @Override
     public void proccessRobotData(byte[] data) {
         int upper = (data[1] * 12) / 0x12;
         int lower = (data[2] * 12) / 0x12;
@@ -49,25 +51,45 @@ public class AerialAssistProtocol extends ProtocolTemplate {
         boolean eStopped = data[0] == cEmergencyStopOn;
     }
 
+    @Override
     public void proccessFmsData() {
 
     }
 
+    @Override
     public void proccessRadioData() {
 
     }
 
+    @Override
     public void resetRobot(){
         resync = 1;
         reboot = 0;
         restartCode = 0;
     }
 
+    @Override
     public void rebootRobot(){
         reboot = 1;
     }
 
+    @Override
     public void restartRobot (){
         restartCode = 1;
+    }
+
+    @Override
+    public NetPackage createRobotPackage() {
+        return null;
+    }
+
+    @Override
+    public NetPackage createFmsPackage() {
+        return null;
+    }
+
+    @Override
+    public NetPackage createRadioPackage() {
+        return null;
     }
 }
