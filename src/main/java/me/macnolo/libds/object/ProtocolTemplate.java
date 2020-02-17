@@ -15,4 +15,7 @@ public abstract class ProtocolTemplate {
     public void resetRobot(){}
     public void rebootRobot(){}
     public void restartRobot (){}
+    public NetPackage createRobotPackage(){return null;}
+    public NetPackage createFmsPackage(){return null;}
+    public NetPackage createRadioPackage(){return null;}
 }

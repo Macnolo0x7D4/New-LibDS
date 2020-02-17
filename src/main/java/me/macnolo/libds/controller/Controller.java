@@ -142,6 +142,19 @@ public class Controller extends Thread {
         return null;
     }
 
+    public NetPackage createPackage(PackageTypes pkgType){
+        switch (pkgType) {
+            case ROBOT:
+                return protocolController.getProtocol().createRobotPackage();
+            case FMS:
+                return protocolController.getProtocol().createFmsPackage();
+            case RADIO:
+                return protocolController.getProtocol().createRadioPackage();
+        }
+
+        return null;
+    }
+
     public boolean isRunning() {
         return isRunning;
     }
