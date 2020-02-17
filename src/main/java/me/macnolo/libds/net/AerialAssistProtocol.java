@@ -8,7 +8,9 @@
 
 package me.macnolo.libds.net;
 
-public class AerialAssistProtocol{
+import me.macnolo.libds.object.ProtocolTemplate;
+
+public class AerialAssistProtocol extends ProtocolTemplate {
 
     static final String version = "v.1.0 nightly.";
     static final String name = "Aerial Assist Protocol.";

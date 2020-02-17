@@ -86,7 +86,7 @@ public class Controller extends Thread {
         if(data != null && data.length == 1024) {
             switch (pkgType){
                 case ROBOT:
-                    protocolController.getSuperProtocol().proccessRobotData(data);
+                    protocolController.getProtocol().proccessRobotData(data);
                     upgradeRobotPackagesReceived();
                     break;
                 case FMS:

@@ -10,6 +10,7 @@ package me.macnolo.libds.controller;
 
 import me.macnolo.libds.enums.Protocol;
 import me.macnolo.libds.net.AerialAssistProtocol;
+import me.macnolo.libds.object.ProtocolTemplate;
 
 public class ProtocolController {
     private Protocol protocol;
@@ -18,29 +19,25 @@ public class ProtocolController {
         this.protocol = protocol;
     }
 
-    public <T> Class<T> getProtocol(){
+    public ProtocolTemplate getProtocol(){
         switch (protocol){
             case INFINITE_RECHARGE:
                 //return (Class<T>)AerialAssistProtocol.class;
             case DEEP_SPACE:
+                //return (Class<T>)AerialAssistProtocol.class;
+            case POWER_UP:
+                //return (Class<T>)AerialAssistProtocol.class;
+            case STEAMWORKS:
                 //return (Class<T>)AerialAssistProtocol.class;
             case STRONGHOLD:
                 //return (Class<T>)AerialAssistProtocol.class;
             case RECYCLE_RUSH:
                 //return (Class<T>)AerialAssistProtocol.class;
             case AERIAL_ASSIST:
-                return (Class<T>)AerialAssistProtocol.class;
+                return new AerialAssistProtocol();
         }
 
         return null;
-    }
-
-    public AerialAssistProtocol getAerialAssistProtocol() {
-        AerialAssistProtocol protocol = null;
-        if (this.protocol == Protocol.AERIAL_ASSIST) {
-            protocol = new AerialAssistProtocol();
-        }
-        return protocol;
     }
 
 }

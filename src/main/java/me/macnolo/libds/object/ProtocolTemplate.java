@@ -6,14 +6,13 @@
  * ----------------------------------------------------------------------------
  */
 
-package me.macnolo.libds.enums;
+package me.macnolo.libds.object;
 
-public enum Protocol {
-    INFINITE_RECHARGE,
-    DEEP_SPACE,
-    POWER_UP,
-    STEAMWORKS,
-    STRONGHOLD,
-    RECYCLE_RUSH,
-    AERIAL_ASSIST
+public abstract class ProtocolTemplate {
+    public void proccessRobotData(byte[] data) {}
+    public void proccessFmsData() {}
+    public void proccessRadioData() {}
+    public void resetRobot(){}
+    public void rebootRobot(){}
+    public void restartRobot (){}
 }
