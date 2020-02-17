@@ -8,6 +8,7 @@
 
 package me.macnolo.libds.controller;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -23,9 +24,11 @@ public class LibDS {
     private Mode mode;
     private Protocol protocol;
 
-    private String robotIp;
-    private String fmsIp;
-    private String radioIp;
+    private byte[] robotIp;
+    private byte[] fmsIp;
+    private byte[] radioIp;
+
+    private IpFormats ipTypeSelected;
 
     public static InetAddress ROBOT_ADDR = null;
     public static InetAddress FMS_ADDR = null;
@@ -33,7 +36,7 @@ public class LibDS {
 
     private Controller controller;
 
-    public LibDS(int team, Alliance alliance, Mode mode, Protocol protocol, String robotIp) {
+    public LibDS(int team, Alliance alliance, Mode mode, Protocol protocol, byte[] robotIp) {
         this.team = team;
         this.alliance = alliance;
         this.mode = mode;
@@ -42,25 +45,33 @@ public class LibDS {
 
         switch(protocol) {
             case AERIAL_ASSIST:
+                ipTypeSelected = IpFormats.IP_1;
                 if(robotIp == null || robotIp.equals("")){
-                    this.robotIp = new IpFormater(this.team, IpFormats.IP_1, 1).getAddress();
+                    this.robotIp = IpFormater.getAddress(ipTypeSelected, team,(byte) 1);
                 }
-                this.fmsIp = new IpFormater(this.team, IpFormats.IP_1, 1).getAddress();
-                this.radioIp = new IpFormater(this.team, IpFormats.IP_1, 1).getAddress();
+                this.fmsIp = IpFormater.getAddress(ipTypeSelected, team, (byte) 2);
+                this.radioIp = IpFormater.getAddress(ipTypeSelected, team, (byte) 3);
                 break;
         }
 
         try {
             if(this.robotIp != null) {
-                ROBOT_ADDR = InetAddress.getByAddress(this.robotIp.getBytes());
+                switch (ipTypeSelected) {
+                    case IP_1:
+                        ROBOT_ADDR = InetAddress.getByAddress(this.robotIp);
+                        break;
+                    default:
+                        ROBOT_ADDR = InetAddress.getByName(this.robotIp.toString());
+                        break;
+                }
             }
 
             if (this.fmsIp != null) {
-                FMS_ADDR = InetAddress.getByAddress(this.fmsIp.getBytes());
+                FMS_ADDR = InetAddress.getByAddress(this.fmsIp);
             }
 
             if (this.radioIp != null) {
-                RADIO_ADDR = InetAddress.getByAddress(this.radioIp.getBytes());
+                RADIO_ADDR = InetAddress.getByAddress(this.radioIp);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();

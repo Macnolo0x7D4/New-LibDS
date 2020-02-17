@@ -8,48 +8,31 @@
 
 package me.macnolo.libds.etc;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import me.macnolo.libds.enums.IpFormats;
 
 public class IpFormater {
-    private int team;
-    private IpFormats format;
-    private int host;
-
-    public IpFormater(int team, IpFormats format, int host) {
-        this.team = team;
-        this.format = format;
-        this.host = host;
-    }
-
-    public String getAddress() {
-        String finalAddress;
+    public static byte[] getAddress(IpFormats format, int team, byte host ) {
+        byte[] finalAddress = {0,0,0,0};
+        String tmp = "";
 
         switch (format) {
             case IP_1:
-                int te = team / 100;
-                int am = team - (te * 100);
-                finalAddress = "10." + te + "." + am + "." + host;
+                byte te = (byte) (team / 100);
+                byte am = (byte) (team - (te * 100));
+                finalAddress[0] = 10;
+                finalAddress[1] = te;
+                finalAddress[2] = am;
+                finalAddress[3] = host;
                 return finalAddress;
             case M_DNS_1:
-                finalAddress = "roboRIO-" + team + "-FRC.local";
+                tmp = "roboRIO-" + team + "-FRC.local";
+                finalAddress = tmp.getBytes();
                 return finalAddress;
             case M_DNS_2:
-                finalAddress = "roboRIO-" + team + ".local";
+                tmp = "roboRIO-" + team + ".local";
+                finalAddress = tmp.getBytes();
                 return finalAddress;
         }
-        return "";
-    }
-
-    public InetAddress getInetAddress(){
-        InetAddress addr = null;
-        try {
-            addr = InetAddress.getByAddress(getAddress().getBytes());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return addr;
+        return null;
     }
 }
