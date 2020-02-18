@@ -8,7 +8,10 @@
 
 package me.macnolo.libds.net;
 
-import me.macnolo.libds.object.NetPackage;
+import me.macnolo.libds.controller.Controller;
+import me.macnolo.libds.enums.Alliance;
+import me.macnolo.libds.etc.Utilities;
+import me.macnolo.libds.object.JoystickData;
 import me.macnolo.libds.object.ProtocolTemplate;
 
 public class AerialAssistProtocol implements ProtocolTemplate {
@@ -79,17 +82,72 @@ public class AerialAssistProtocol implements ProtocolTemplate {
     }
 
     @Override
-    public NetPackage createRobotPackage() {
+    public byte[] createRobotPackage(int robotPackageSent, int controlCode, int digitalInput, int team, Alliance alliance, JoystickData joystick) {
+        byte[] pkg = new byte[1024];
+        byte allianceCode = 0;
+        byte positionCode = 0;
+
+        int checksum = 0;
+
+        switch (alliance){
+            case RED1:
+                allianceCode = cAllianceRed;
+                positionCode = cPosition1;
+                break;
+            case RED2:
+                allianceCode = cAllianceRed;
+                positionCode = cPosition2;
+                break;
+            case RED3:
+                allianceCode = cAllianceRed;
+                positionCode = cPosition3;
+                break;
+            case BLUE1:
+                allianceCode = cAllianceBlue;
+                positionCode = cPosition1;
+                break;
+            case BLUE2:
+                allianceCode = cAllianceBlue;
+                positionCode = cPosition2;
+                break;
+            case BLUE3:
+                allianceCode = cAllianceBlue;
+                positionCode = cPosition3;
+                break;
+        }
+
+        pkg[0] = (byte) ((robotPackageSent & 0xff00) >> 8);
+        pkg[1] = (byte) ((robotPackageSent & 0xff));
+
+        pkg[2] = (byte) (controlCode);
+        pkg[3] = (byte) (digitalInput);
+
+        pkg[4] = (byte) ((team & 0xff00) >> 8);
+        pkg[5] = (byte) ((team & 0xff));
+
+        pkg[6] = (allianceCode);
+        pkg[7] = (positionCode);
+
+        for(int i = 0; i < Utilities.DRIVER_STATION_VERSION.length; i++){
+            pkg[72 + i] = Utilities.DRIVER_STATION_VERSION[i];
+        }
+
+        pkg[1020] = (byte)((checksum & 0xff000000) >> 24);
+        pkg[1021] = (byte)((checksum & 0xff0000) >> 16);
+        pkg[1022] = (byte)((checksum & 0xff00) >> 8);
+        pkg[1023] = (byte)(checksum & 0xff);
+
+        Controller.upgradeRobotPackagesSent();
+        return pkg;
+    }
+
+    @Override
+    public byte[] createFmsPackage() {
         return null;
     }
 
     @Override
-    public NetPackage createFmsPackage() {
-        return null;
-    }
-
-    @Override
-    public NetPackage createRadioPackage() {
+    public byte[] createRadioPackage() {
         return null;
     }
 }

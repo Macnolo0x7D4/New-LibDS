@@ -8,6 +8,8 @@
 
 package me.macnolo.libds.object;
 
+import me.macnolo.libds.enums.Alliance;
+
 public interface ProtocolTemplate {
     void proccessRobotData(byte[] data);
     void proccessFmsData();
@@ -17,9 +19,9 @@ public interface ProtocolTemplate {
     void rebootRobot();
     void restartRobot ();
 
-    NetPackage createRobotPackage();
-    NetPackage createFmsPackage();
-    NetPackage createRadioPackage();
+    byte[] createRobotPackage(int robotPackageSent, int controlCode, int digitalInput, int team, Alliance alliance, JoystickData joystick);
+    byte[] createFmsPackage();
+    byte[] createRadioPackage();
 
     String version = "Base Protocol - Not Usable";
     String name = "v.1.0 nightly";

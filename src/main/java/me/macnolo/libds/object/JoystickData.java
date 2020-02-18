@@ -8,22 +8,5 @@
 
 package me.macnolo.libds.object;
 
-import me.macnolo.libds.enums.PackageTypes;
-
-public class NetPackage {
-    private byte[] pkg = new byte[1024];
-
-    public NetPackage(PackageTypes pkgTypes) {
-        if(pkgTypes == PackageTypes.ROBOT) {
-
-        }
-    }
-
-    public byte[] getPackage() {
-        return pkg;
-    }
-
-    public int getLength(){
-        return pkg.length;
-    }
+public class JoystickData {
 }

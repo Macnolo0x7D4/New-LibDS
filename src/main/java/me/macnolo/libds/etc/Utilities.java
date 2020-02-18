@@ -18,4 +18,6 @@ public class Utilities {
 
     public static String CREDITS_PROTOCOL = "By Manuel Diaz from WinT 3794.";
 
+    public static final byte[] DRIVER_STATION_VERSION = {0,0,0,0,0,0,0,0};
+
 }

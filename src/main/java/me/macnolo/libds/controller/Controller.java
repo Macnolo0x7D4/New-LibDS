@@ -11,15 +11,12 @@ package me.macnolo.libds.controller;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 
 import me.macnolo.libds.enums.Alliance;
 import me.macnolo.libds.enums.Mode;
 import me.macnolo.libds.enums.PackageTypes;
 import me.macnolo.libds.enums.Protocol;
 import me.macnolo.libds.etc.Utilities;
-import me.macnolo.libds.object.NetPackage;
 
 public class Controller extends Thread {
     private int team;
@@ -56,14 +53,14 @@ public class Controller extends Thread {
             DatagramSocket radioSocket = new DatagramSocket(Utilities.RADIO_PORT);
 
             while (isRunning) {
-                NetPackage robotPkg = new NetPackage(PackageTypes.ROBOT);
-                DatagramPacket robotDataPkg = new DatagramPacket(robotPkg.getPackage(), robotPkg.getLength());
+                byte[] robotPkg = new byte[1024];
+                DatagramPacket robotDataPkg = new DatagramPacket(robotPkg, robotPkg.length);
 
-                NetPackage fmsPkg = new NetPackage(PackageTypes.FMS);
-                DatagramPacket fmsDataPkg = new DatagramPacket(fmsPkg.getPackage(), fmsPkg.getLength());
+                byte[] fmsPkg = new byte[1024];
+                DatagramPacket fmsDataPkg = new DatagramPacket(fmsPkg, fmsPkg.length);
 
-                NetPackage radioPkg = new NetPackage(PackageTypes.RADIO);
-                DatagramPacket radioDataPkg = new DatagramPacket(radioPkg.getPackage(), radioPkg.getLength());
+                byte[] radioPkg = new byte[1024];
+                DatagramPacket radioDataPkg = new DatagramPacket(radioPkg, radioPkg.length);
 
                 robotSocket.receive(robotDataPkg);
                 fmsSocket.receive(fmsDataPkg);
@@ -100,12 +97,12 @@ public class Controller extends Thread {
 
     }
 
-    public Exception sendPackage(PackageTypes pkgType, NetPackage netPackage) {
+    public Exception sendPackage(PackageTypes pkgType, byte[] netPackage) {
         switch (pkgType) {
             case ROBOT:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage.getPackage(), netPackage.getLength(), LibDS.ROBOT_ADDR, Utilities.ROBOT_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.ROBOT_ADDR, Utilities.ROBOT_PORT);
 
                     udp.send(pkg);
                     upgradeRobotPackagesSent();
@@ -117,7 +114,7 @@ public class Controller extends Thread {
             case FMS:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage.getPackage(), netPackage.getLength(), LibDS.FMS_ADDR, Utilities.FMS_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.FMS_ADDR, Utilities.FMS_PORT);
 
                     udp.send(pkg);
                     upgradeFMSPackagesSent();
@@ -129,7 +126,7 @@ public class Controller extends Thread {
             case RADIO:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage.getPackage(), netPackage.getLength(), LibDS.RADIO_ADDR, Utilities.RADIO_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.RADIO_ADDR, Utilities.RADIO_PORT);
 
                     udp.send(pkg);
                     upgradeRadioPackagesSent();
@@ -142,10 +139,10 @@ public class Controller extends Thread {
         return null;
     }
 
-    public NetPackage createPackage(PackageTypes pkgType){
+    public byte[] createPackage(PackageTypes pkgType){
         switch (pkgType) {
             case ROBOT:
-                return protocolController.getProtocol().createRobotPackage();
+                return protocolController.getProtocol().createRobotPackage(robotPackagesSent,0,0,team, alliance, null);
             case FMS:
                 return protocolController.getProtocol().createFmsPackage();
             case RADIO:
@@ -164,9 +161,9 @@ public class Controller extends Thread {
     }
 
 
-    private static void upgradeRobotPackagesSent() { robotPackagesSent++; }
-    private static void upgradeFMSPackagesSent() { fmsPackagesSent++; }
-    private static void upgradeRadioPackagesSent() { radioPackagesSent++; }
+    public static void upgradeRobotPackagesSent() { robotPackagesSent++; }
+    public static void upgradeFMSPackagesSent() { fmsPackagesSent++; }
+    public static void upgradeRadioPackagesSent() { radioPackagesSent++; }
 
     private static void upgradeRobotPackagesReceived() { robotPackagesReceived++; }
     private static void upgradeFMSPackagesReceived() { fmsPackagesReceived++; }
