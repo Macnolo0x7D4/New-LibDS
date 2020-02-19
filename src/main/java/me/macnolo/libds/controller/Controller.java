@@ -70,16 +70,16 @@ public class Controller extends Thread {
                 byte[] fmsData = fmsDataPkg.getData();
                 byte[] radioData = radioDataPkg.getData();
 
-                processData(robotData, this.protocol, PackageTypes.ROBOT);
-                processData(fmsData, this.protocol, PackageTypes.FMS);
-                processData(radioData, this.protocol, PackageTypes.RADIO);
+                processData(robotData, PackageTypes.ROBOT);
+                processData(fmsData, PackageTypes.FMS);
+                processData(radioData, PackageTypes.RADIO);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void processData(byte[] data, Protocol protocol, PackageTypes pkgType) {
+    public void processData(byte[] data, PackageTypes pkgType) {
         if(data != null && data.length == 1024) {
             switch (pkgType){
                 case ROBOT:
@@ -150,6 +150,14 @@ public class Controller extends Thread {
         }
 
         return null;
+    }
+
+    public void setAlliance(Alliance alliance){
+        this.alliance = alliance;
+    }
+
+    public void setMode(Mode mode){
+        this.mode = mode;
     }
 
     public boolean isRunning() {

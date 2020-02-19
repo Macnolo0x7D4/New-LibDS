@@ -9,6 +9,7 @@
 package me.macnolo.libds.object;
 
 import me.macnolo.libds.enums.Alliance;
+import me.macnolo.libds.enums.Mode;
 
 public interface ProtocolTemplate {
     void proccessRobotData(byte[] data);
@@ -19,7 +20,11 @@ public interface ProtocolTemplate {
     void rebootRobot();
     void restartRobot ();
 
-    byte[] createRobotPackage(int robotPackageSent, int controlCode, int digitalInput, int team, Alliance alliance, JoystickData joystick);
+    void setResync(boolean push);
+    void setFmsExisting(boolean push);
+    void setEmergencyStopped(boolean push);
+
+    byte[] createRobotPackage(int robotPackageSent, int digitalInput, int team, Alliance alliance, Mode mode, JoystickData joystick);
     byte[] createFmsPackage();
     byte[] createRadioPackage();
 
@@ -48,7 +53,11 @@ public interface ProtocolTemplate {
     int maxButtons = 0;
     int maxJoysticks = 0;
 
-    int resync = 0;
-    int reboot = 0;
-    int restartCode = 0;
+    boolean resync = false;
+    boolean reboot = false;
+    boolean restartCode = false;
+
+    boolean isEnable = false;
+    boolean isEmergencyStopped = false;
+    boolean isFmsExisting = false;
 }

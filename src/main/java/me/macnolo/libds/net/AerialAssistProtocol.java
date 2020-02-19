@@ -8,8 +8,11 @@
 
 package me.macnolo.libds.net;
 
+import java.util.zip.CRC32;
+
 import me.macnolo.libds.controller.Controller;
 import me.macnolo.libds.enums.Alliance;
+import me.macnolo.libds.enums.Mode;
 import me.macnolo.libds.etc.Utilities;
 import me.macnolo.libds.object.JoystickData;
 import me.macnolo.libds.object.ProtocolTemplate;
@@ -41,9 +44,13 @@ public class AerialAssistProtocol implements ProtocolTemplate {
     static final int maxButtons = 10;
     static final int maxJoysticks = 4;
 
-    private static int resync = 1;
-    private static int reboot = 0;
-    private static int restartCode = 0;
+    private static boolean resync = true;
+    private static boolean reboot = false;
+    private static boolean restartCode = false;
+
+    private static boolean isEnable = false;
+    private static boolean isEmergencyStopped = false;
+    private static boolean isFmsExisting = false;
 
     @Override
     public void proccessRobotData(byte[] data) {
@@ -66,28 +73,33 @@ public class AerialAssistProtocol implements ProtocolTemplate {
 
     @Override
     public void resetRobot(){
-        resync = 1;
-        reboot = 0;
-        restartCode = 0;
+        resync = true;
+        reboot = false;
+        restartCode = false;
     }
 
     @Override
     public void rebootRobot(){
-        reboot = 1;
+        reboot = true;
     }
 
     @Override
     public void restartRobot (){
-        restartCode = 1;
+        restartCode = true;
     }
 
     @Override
-    public byte[] createRobotPackage(int robotPackageSent, int controlCode, int digitalInput, int team, Alliance alliance, JoystickData joystick) {
+    public byte[] createRobotPackage(int robotPackageSent, int digitalInput, int team, Alliance alliance, Mode mode, JoystickData joystick) {
         byte[] pkg = new byte[1024];
+        CRC32 crc32 = new CRC32();
+
         byte allianceCode = 0;
         byte positionCode = 0;
 
-        int checksum = 0;
+        int controlCode = 0;
+        int enabled = 0;
+
+        long checksum;
 
         switch (alliance){
             case RED1:
@@ -116,6 +128,42 @@ public class AerialAssistProtocol implements ProtocolTemplate {
                 break;
         }
 
+        controlCode = cEmergencyStopOff;
+        enabled = isEnable ? cEnabled : 0x00;
+
+        switch (mode){
+            case AUTO:
+                controlCode |= enabled + cAutonomous;
+                break;
+            case TELEOP:
+                controlCode |= enabled + cTeleoperated;
+                break;
+            case TEST:
+                controlCode |= enabled + cTestMode;
+                break;
+            case PRACTICE:
+                controlCode |= enabled + cTestMode;
+                break;
+            default:
+                controlCode = cEmergencyStopOff;
+        }
+
+        if (resync) {
+            controlCode |= cResyncComms;
+        }
+
+        if (isFmsExisting) {
+            controlCode |= cFMS_Attached;
+        }
+
+        if (isEmergencyStopped) {
+            controlCode = cEmergencyStopOn;
+        }
+
+        if (reboot) {
+            controlCode = cRebootRobot;
+        }
+
         pkg[0] = (byte) ((robotPackageSent & 0xff00) >> 8);
         pkg[1] = (byte) ((robotPackageSent & 0xff));
 
@@ -131,6 +179,9 @@ public class AerialAssistProtocol implements ProtocolTemplate {
         for(int i = 0; i < Utilities.DRIVER_STATION_VERSION.length; i++){
             pkg[72 + i] = Utilities.DRIVER_STATION_VERSION[i];
         }
+
+        crc32.update(pkg);
+        checksum = crc32.getValue();
 
         pkg[1020] = (byte)((checksum & 0xff000000) >> 24);
         pkg[1021] = (byte)((checksum & 0xff0000) >> 16);
@@ -149,5 +200,20 @@ public class AerialAssistProtocol implements ProtocolTemplate {
     @Override
     public byte[] createRadioPackage() {
         return null;
+    }
+
+    @Override
+    public void setResync(boolean push) {
+        resync = push;
+    }
+
+    @Override
+    public void setFmsExisting(boolean push) {
+        isFmsExisting = push;
+    }
+
+    @Override
+    public void setEmergencyStopped(boolean push) {
+        isEmergencyStopped = push;
     }
 }

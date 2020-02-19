@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
 import me.macnolo.libds.enums.Alliance;
 import me.macnolo.libds.enums.IpFormats;
 import me.macnolo.libds.enums.Mode;
+import me.macnolo.libds.enums.PackageTypes;
 import me.macnolo.libds.enums.Protocol;
 import me.macnolo.libds.etc.IpFormater;
 
@@ -36,6 +37,7 @@ public class LibDS {
     private Controller controller;
 
     public LibDS(int team, Alliance alliance, Mode mode, Protocol protocol, byte[] robotIp) {
+        byte[] tmp;
         this.team = team;
         this.alliance = alliance;
         this.mode = mode;
@@ -77,8 +79,10 @@ public class LibDS {
         }
 
         controller = new Controller(this.team, this.alliance, this.mode, this.protocol);
-
         controller.start();
+
+        tmp = controller.createPackage(PackageTypes.ROBOT);
+        controller.sendPackage(PackageTypes.ROBOT, tmp);
     }
 
     public InterruptedException close(){
@@ -92,12 +96,18 @@ public class LibDS {
     }
 
     public void setNewAlliance(Alliance alliance){
-
+        byte[] tmp;
+        controller.setAlliance(alliance);
+        tmp = controller.createPackage(PackageTypes.ROBOT);
+        controller.sendPackage(PackageTypes.ROBOT, tmp);
     }
 
 
     public void setNewMode(Mode mode){
-
+        byte[] tmp;
+        controller.setMode(mode);
+        tmp = controller.createPackage(PackageTypes.ROBOT);
+        controller.sendPackage(PackageTypes.ROBOT, tmp);
     }
 
     public void setEnable(boolean enable) {
