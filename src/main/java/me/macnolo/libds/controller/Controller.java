@@ -36,6 +36,9 @@ public class Controller extends Thread {
     private static int fmsPackagesReceived = 0;
     private static int radioPackagesReceived = 0;
 
+    private static boolean isRobotPackage;
+    private static boolean isFMSPackage;
+
     Controller(int team, Alliance alliance, Mode mode, Protocol protocol) {
         this.team = team;
         this.alliance = alliance;
@@ -70,9 +73,23 @@ public class Controller extends Thread {
                 byte[] fmsData = fmsDataPkg.getData();
                 byte[] radioData = radioDataPkg.getData();
 
-                processData(robotData, PackageTypes.ROBOT);
-                processData(fmsData, PackageTypes.FMS);
-                processData(radioData, PackageTypes.RADIO);
+                if(robotData != null){
+                    isRobotPackage = true;
+                    processData(robotData, PackageTypes.ROBOT);
+                } else{
+                    isRobotPackage = false;
+                }
+
+                if(fmsData != null){
+                    isFMSPackage = true;
+                    processData(fmsData, PackageTypes.FMS);
+                } else{
+                    isFMSPackage = false;
+                }
+
+                if(radioData != null) {
+                    processData(radioData, PackageTypes.RADIO);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -142,7 +159,7 @@ public class Controller extends Thread {
     public byte[] createPackage(PackageTypes pkgType){
         switch (pkgType) {
             case ROBOT:
-                return protocolController.getProtocol().createRobotPackage(robotPackagesSent,0,0,team, alliance, null);
+                return protocolController.getProtocol().createRobotPackage(robotPackagesSent,0,team, alliance, mode,null);
             case FMS:
                 return protocolController.getProtocol().createFmsPackage();
             case RADIO:
@@ -176,4 +193,28 @@ public class Controller extends Thread {
     private static void upgradeRobotPackagesReceived() { robotPackagesReceived++; }
     private static void upgradeFMSPackagesReceived() { fmsPackagesReceived++; }
     private static void upgradeRadioPackagesReceived() { radioPackagesReceived++; }
+
+    public static int getRobotPackagesSent() {
+        return robotPackagesSent;
+    }
+
+    public static int getFmsPackagesSent() {
+        return fmsPackagesSent;
+    }
+
+    public static int getRobotPackagesReceived() {
+        return robotPackagesReceived;
+    }
+
+    public static int getFmsPackagesReceived() {
+        return fmsPackagesReceived;
+    }
+
+    public static boolean isRobotPackage() {
+        return isRobotPackage;
+    }
+
+    public static boolean isFMSPackage() {
+        return isFMSPackage;
+    }
 }

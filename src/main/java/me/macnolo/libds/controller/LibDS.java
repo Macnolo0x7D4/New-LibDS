@@ -17,6 +17,7 @@ import me.macnolo.libds.enums.Mode;
 import me.macnolo.libds.enums.PackageTypes;
 import me.macnolo.libds.enums.Protocol;
 import me.macnolo.libds.etc.IpFormater;
+import me.macnolo.libds.etc.Utilities;
 
 public class LibDS {
     private int team;
@@ -106,13 +107,27 @@ public class LibDS {
     public void setNewMode(Mode mode){
         byte[] tmp;
         controller.setMode(mode);
-        tmp = controller.createPackage(PackageTypes.ROBOT);
-        controller.sendPackage(PackageTypes.ROBOT, tmp);
     }
 
     public void setEnable(boolean enable) {
         if(enable) {
 
         }
+    }
+
+    public void updateConfig(){
+        byte[] tmp;
+        tmp = controller.createPackage(PackageTypes.ROBOT);
+        controller.sendPackage(PackageTypes.ROBOT, tmp);
+    }
+
+    public byte[] getData(){
+        byte[] data = new byte[Utilities.DATA_TRANSFER_LENGHT];
+        data[0] = (byte) (controller.isRobotPackage() ? 1 : 0);
+        data[1] = (byte) (controller.isFMSPackage() ? 1 : 0);
+        data[2] = (byte) (controller.getRobotPackagesSent());
+        data[3] = (byte) (controller.getRobotPackagesReceived());
+
+        return data;
     }
 }

@@ -139,8 +139,6 @@ public class AerialAssistProtocol implements ProtocolTemplate {
                 controlCode |= enabled + cTeleoperated;
                 break;
             case TEST:
-                controlCode |= enabled + cTestMode;
-                break;
             case PRACTICE:
                 controlCode |= enabled + cTestMode;
                 break;
@@ -176,8 +174,8 @@ public class AerialAssistProtocol implements ProtocolTemplate {
         pkg[6] = (allianceCode);
         pkg[7] = (positionCode);
 
-        for(int i = 0; i < Utilities.DRIVER_STATION_VERSION.length; i++){
-            pkg[72 + i] = Utilities.DRIVER_STATION_VERSION[i];
+        for(int i = 0; i < Utilities.DRIVER_STATION_VERSION_2014.length; i++){
+            pkg[72 + i] = Utilities.DRIVER_STATION_VERSION_2014[i];
         }
 
         crc32.update(pkg);
@@ -200,6 +198,21 @@ public class AerialAssistProtocol implements ProtocolTemplate {
     @Override
     public byte[] createRadioPackage() {
         return null;
+    }
+
+    @Override
+    public byte[] getRobotData() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getFmsData() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getRadioData() {
+        return new byte[0];
     }
 
     @Override

@@ -16,6 +16,10 @@ public interface ProtocolTemplate {
     void proccessFmsData();
     void proccessRadioData();
 
+    byte[] getRobotData();
+    byte[] getFmsData();
+    byte[] getRadioData();
+
     void resetRobot();
     void rebootRobot();
     void restartRobot ();
