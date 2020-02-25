@@ -29,11 +29,11 @@ public class LibDS {
     private byte[] fmsIp;
     private byte[] radioIp;
 
-    private IpFormats ipTypeSelected;
+    private InetAddress robotAddress;
+    private InetAddress fmsAddress;
+    private InetAddress radioAddress;
 
-    public static InetAddress ROBOT_ADDR = null;
-    public static InetAddress FMS_ADDR = null;
-    public static InetAddress RADIO_ADDR = null;
+    private IpFormats ipTypeSelected;
 
     private Controller controller;
 
@@ -60,20 +60,20 @@ public class LibDS {
             if(this.robotIp != null) {
                 switch (ipTypeSelected) {
                     case IP_1:
-                        ROBOT_ADDR = InetAddress.getByAddress(this.robotIp);
+                        robotAddress = InetAddress.getByAddress(this.robotIp);
                         break;
                     default:
-                        ROBOT_ADDR = InetAddress.getByName(this.robotIp.toString());
+                        robotAddress = InetAddress.getByName(this.robotIp.toString());
                         break;
                 }
             }
 
             if (this.fmsIp != null) {
-                FMS_ADDR = InetAddress.getByAddress(this.fmsIp);
+                fmsAddress = InetAddress.getByAddress(this.fmsIp);
             }
 
             if (this.radioIp != null) {
-                RADIO_ADDR = InetAddress.getByAddress(this.radioIp);
+                radioAddress = InetAddress.getByAddress(this.radioIp);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -81,6 +81,10 @@ public class LibDS {
 
         controller = new Controller(this.team, this.alliance, this.mode, this.protocol);
         controller.start();
+
+        controller.setRobotAddress(robotAddress);
+        controller.setFMSAddress(fmsAddress);
+        controller.setRadioAddress(radioAddress);
 
         tmp = controller.createPackage(PackageTypes.ROBOT);
         controller.sendPackage(PackageTypes.ROBOT, tmp);
@@ -123,11 +127,12 @@ public class LibDS {
 
     public byte[] getData(){
         byte[] data = new byte[Utilities.DATA_TRANSFER_LENGHT];
+        /*
         data[0] = (byte) (controller.isRobotPackage() ? 1 : 0);
         data[1] = (byte) (controller.isFMSPackage() ? 1 : 0);
         data[2] = (byte) (controller.getRobotPackagesSent());
         data[3] = (byte) (controller.getRobotPackagesReceived());
-
+*/
         return data;
     }
 }

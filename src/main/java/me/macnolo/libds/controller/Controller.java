@@ -11,6 +11,7 @@ package me.macnolo.libds.controller;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import me.macnolo.libds.enums.Alliance;
 import me.macnolo.libds.enums.Mode;
@@ -26,8 +27,6 @@ public class Controller extends Thread {
 
     private boolean isRunning = true;
 
-    private ProtocolController protocolController;
-
     private static int robotPackagesSent = 0;
     private static int fmsPackagesSent = 0;
     private static int radioPackagesSent = 0;
@@ -39,13 +38,15 @@ public class Controller extends Thread {
     private static boolean isRobotPackage;
     private static boolean isFMSPackage;
 
+    private InetAddress robotAddress;
+    private InetAddress FMSAddress;
+    private InetAddress radioAddress;
+
     Controller(int team, Alliance alliance, Mode mode, Protocol protocol) {
         this.team = team;
         this.alliance = alliance;
         this.mode = mode;
         this.protocol = protocol;
-
-        ProtocolController protocolController = new ProtocolController(this.protocol);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class Controller extends Thread {
         if(data != null && data.length == 1024) {
             switch (pkgType){
                 case ROBOT:
-                    protocolController.getProtocol().proccessRobotData(data);
+                    new ProtocolController(this.protocol).getProtocol().proccessRobotData(data);
                     upgradeRobotPackagesReceived();
                     break;
                 case FMS:
@@ -119,7 +120,7 @@ public class Controller extends Thread {
             case ROBOT:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.ROBOT_ADDR, Utilities.ROBOT_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, getRobotAddress(), Utilities.ROBOT_PORT);
 
                     udp.send(pkg);
                     upgradeRobotPackagesSent();
@@ -131,7 +132,7 @@ public class Controller extends Thread {
             case FMS:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.FMS_ADDR, Utilities.FMS_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, getFMSAddress(), Utilities.FMS_PORT);
 
                     udp.send(pkg);
                     upgradeFMSPackagesSent();
@@ -143,7 +144,7 @@ public class Controller extends Thread {
             case RADIO:
                 try {
                     DatagramSocket udp = new DatagramSocket();
-                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, LibDS.RADIO_ADDR, Utilities.RADIO_PORT);
+                    DatagramPacket pkg = new DatagramPacket(netPackage, netPackage.length, getRadioAddress(), Utilities.RADIO_PORT);
 
                     udp.send(pkg);
                     upgradeRadioPackagesSent();
@@ -157,16 +158,21 @@ public class Controller extends Thread {
     }
 
     public byte[] createPackage(PackageTypes pkgType){
+        byte[] pkg = new byte[1024];
+
         switch (pkgType) {
             case ROBOT:
-                return protocolController.getProtocol().createRobotPackage(robotPackagesSent,0,team, alliance, mode,null);
+                pkg = new ProtocolController(this.protocol).getProtocol().createRobotPackage(robotPackagesSent,0,team, alliance, mode,null);
+                break;
             case FMS:
-                return protocolController.getProtocol().createFmsPackage();
+                pkg = new ProtocolController(this.protocol).getProtocol().createFmsPackage();
+                break;
             case RADIO:
-                return protocolController.getProtocol().createRadioPackage();
+                pkg = new ProtocolController(this.protocol).getProtocol().createRadioPackage();
+                break;
         }
 
-        return null;
+        return pkg;
     }
 
     public void setAlliance(Alliance alliance){
@@ -216,5 +222,29 @@ public class Controller extends Thread {
 
     public static boolean isFMSPackage() {
         return isFMSPackage;
+    }
+
+    public InetAddress getRobotAddress() {
+        return robotAddress;
+    }
+
+    public void setRobotAddress(InetAddress robotAddress) {
+        this.robotAddress = robotAddress;
+    }
+
+    public InetAddress getFMSAddress() {
+        return FMSAddress;
+    }
+
+    public void setFMSAddress(InetAddress FMSAddress) {
+        this.FMSAddress = FMSAddress;
+    }
+
+    public InetAddress getRadioAddress() {
+        return radioAddress;
+    }
+
+    public void setRadioAddress(InetAddress radioAddress) {
+        this.radioAddress = radioAddress;
     }
 }

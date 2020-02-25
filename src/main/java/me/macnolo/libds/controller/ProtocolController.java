@@ -22,7 +22,7 @@ public class ProtocolController {
     public ProtocolTemplate getProtocol(){
         switch (protocol){
             case INFINITE_RECHARGE:
-                //return (Class<T>)AerialAssistProtocol.class;
+                return new AerialAssistProtocol();
             case DEEP_SPACE:
                 //return (Class<T>)AerialAssistProtocol.class;
             case POWER_UP:
