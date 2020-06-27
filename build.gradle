@@ -7,23 +7,32 @@
  */
 
 apply plugin: 'java-library'
-apply plugin: 'maven-publish'
+
+plugins {
+    id("maven-publish")
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
+
 publishing {
-  repositories {
-    maven {
-      name = "GitHubPackages"
-      url = "https://maven.pkg.github.com/mcn2004/New-LibDS"
-      credentials = {
-        username = System.getenv("GITHUB_ACTOR")
-        password = System.getenv("GITHUB_TOKEN")
-      }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/mcn2004/new-libds")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
-  }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
 
 sourceCompatibility = "7"
